@@ -14,8 +14,6 @@ Route::get('/dashboard', function () {
 
 Route::resource('users', UserController::class);
 
-//Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
-
 Route::middleware('auth')->group(function () {
     Route::resource('users', \App\Http\Controllers\UserController::class)->except(['index', 'show', 'edit', 'update', 'create', 'destroy']);
 });
