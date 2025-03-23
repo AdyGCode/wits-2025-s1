@@ -105,6 +105,7 @@ class UserController extends Controller
             'users.preferred_pronouns as preferred_pronouns',
             'users.created_at as created_at',
             'users.updated_at as updated_at',
+
         )
             ->where('users.id', $id)
             ->first();
@@ -128,9 +129,7 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('users.create', [
-            'roles' => $roles
-        ]);
+        return view('users.create', compact('roles'));
     }
 
     /**
