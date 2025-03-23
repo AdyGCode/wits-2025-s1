@@ -40,34 +40,21 @@ class UserController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Display a listing of the resource.
-     *
+     *Get all users and send them to the view.
      */
     public function index()
     {
-        $users = User::paginate(6);
-        $message = session('message', null);
-        return view('users.index', compact(['users','message']));
-    }
-    /**
-     *Get all users and send them to the view.
-     */
-    public function home()
-    {
         $currentUser = Auth::user();
 
-        if ($currentUser->hasRole(['SuperAdmin'])) {
-            $users = User::all();
+        // Superadmin Can access all user list
+        if ($currentUser->hasRole('SuperAdmin')) {
+            $users = User::paginate(6);
         } else {
+            // register Can access there own data.
             $users = User::where('user_id', $currentUser->id)
                 ->orWhere('id', $currentUser->id)
                 ->get();
         }
-
-        foreach ($users as $user) {
-            $this->authorize('view', $user);
-        }
-
         return view('users.index', compact('users'));
     }
 
@@ -91,13 +78,13 @@ class UserController extends Controller
         $keywords = $request->input('keywords', '');
 
         $users = User::where('given_name', 'like', "%{$keywords}%")
-            ->orWhere('family_name', 'like', "%{$keywords}%")
+            ->orWhere('preferred_name', 'like', "%{$keywords}%")
             ->orWhere('email', 'like', "%{$keywords}%")
             ->orderBy('given_name')
-            ->orderBy('family_name')
+            ->orderBy('preferred_name')
             ->get();
 
-        return view('users.home', [
+        return view('users.index', [
             'users' => $users,
             'keywords' => $keywords,
         ]);
@@ -111,14 +98,13 @@ class UserController extends Controller
     {
 
         $user = User::select(
-            'users.nickname as nickname',
             'users.id as id',
             'users.given_name as given_name',
-            'users.family_name as family_name',
+            'users.preferred_name as preferred_name',
             'users.email as email',
+            'users.preferred_pronouns as preferred_pronouns',
             'users.created_at as created_at',
             'users.updated_at as updated_at',
-            'users.user_id as user_id'
         )
             ->where('users.id', $id)
             ->first();
