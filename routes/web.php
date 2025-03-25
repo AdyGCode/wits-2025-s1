@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', [\App\Http\Controllers\StaticController::class, 'home'])->name('welcome');
 Route::get('/about', [\App\Http\Controllers\StaticController::class, 'about'])->name('about');
@@ -13,6 +15,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::resource('users', UserController::class);
+
 
 Route::middleware('auth')->group(function () {
     Route::resource('users', \App\Http\Controllers\UserController::class)->except(['index', 'show', 'edit', 'update', 'create', 'destroy']);

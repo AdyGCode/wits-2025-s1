@@ -46,6 +46,10 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
 
+        if (!$currentUser) {
+            return redirect()->route('login')->with('error', 'You must be logged in to view this page.');
+        }
+
         // Superadmin Can access all user list
         if ($currentUser->hasRole('SuperAdmin')) {
             $users = User::paginate(6);
@@ -53,7 +57,7 @@ class UserController extends Controller
             // register Can access there own data.
             $users = User::where('user_id', $currentUser->id)
                 ->orWhere('id', $currentUser->id)
-                ->get();
+                ->paginate(6);
         }
         return view('users.index', compact('users'));
     }
@@ -161,67 +165,7 @@ class UserController extends Controller
 
         return redirect(route('users.index'))
             ->with('success', 'User created');
-
-
-        // $allowedFields = ['given_name', 'preferred_name', 'preferred_pronouns', 'email', 'password', 'password_confirmation', 'role'];
-
-        // $validator = Validator::make($request->all(), [
-        //     'given_name' => 'required|string',
-        //     'preferred_name' => 'required|string',
-        //     'preferred_pronouns' => 'required',
-        //     'email' => 'required|email',
-        //     'role' => 'required|string|exists:roles,name',
-        //     'password' => 'nullable|string|min:8|confirmed',
-        // ], [
-        //     'given_name.required' => ' given name is required.',
-        //     'preferred_name.required' => ' preferred name is required.',
-        //     'email.required' => 'email address is required.',
-        //     'password.min' => 'password must be at least 8 characters.',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return redirect()->back()
-        //         ->withErrors($validator)
-        //         ->withInput();
-        // }
-
-        // $newUserData = $request->only($allowedFields);
-        // $newUserData['user_id'] = Auth::id();
-
-        // if (empty($newUserData['preferred_name'])) {
-        //     $newUserData['preferred_name'] = $newUserData['given_name'];
-        // }
-
-        // if (!empty($newUserData['password'])) {
-        //     $newUserData['password'] = Hash::make($newUserData['password']);
-        // }
-
-
-        // $newUser = new User($newUserData);
-
-
-        // $role = Role::findByName($request->input('role'), 'web');
-
-        // // Can current user create a Admin user?
-        // if (!$this->authorize('create', [$newUser])) {
-        //     return redirect()->back()
-        //         ->withErrors(['role' => 'Administrators are not allowed to create users with the Administrator role.'])
-        //         ->withInput();
-        // }
-
-
-        // $user = User::create($newUserData);
-
-
-        // $user->assignRole($role);
-
-        // Session::flash('success', 'User created.');
-
-        // return redirect()->route('users.index');
     }
-
-
-
 
 
     /**
