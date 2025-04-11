@@ -50,15 +50,8 @@ class UserController extends Controller
             return redirect()->route('login')->with('error', 'You must be logged in to view this page.');
         }
 
-        // Superadmin Can access all user list
-        if ($currentUser->hasRole('SuperAdmin')) {
-            $users = User::paginate(6);
-        } else {
-            // register Can access there own data.
-            $users = User::where('user_id', $currentUser->id)
-                ->orWhere('id', $currentUser->id)
-                ->paginate(6);
-        }
+        $users = User::paginate(6);
+        
         return view('users.index', compact('users'));
     }
 
