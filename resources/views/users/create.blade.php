@@ -53,6 +53,14 @@
                                 </div>
 
                                 <div class="flex flex-col my-2">
+                                    <x-input-label for="given_name">
+                                        Family Name
+                                    </x-input-label>
+                                    <x-text-input id="family_name" name="family_name" value="{{ old('family_name') }}" />
+                                    <x-input-error :messages="$errors->get('family_name')" class="mt-2" />
+                                </div>
+
+                                <div class="flex flex-col my-2">
                                     <x-input-label for="preferred_name">
                                         Preferred Name
                                     </x-input-label>

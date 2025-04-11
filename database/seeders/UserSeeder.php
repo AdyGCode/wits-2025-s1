@@ -18,7 +18,8 @@ class UserSeeder extends Seeder
         $seedData = [
             [
                 'id'=>100,
-                'given_name'=>'Ad Ministrator',
+                'given_name'=>'Ad',
+                'family_name'=>'Ministrator',
                 'preferred_name'=>'Ad',
                 'preferred_pronouns' => 'he/him',
                 'email'=>'admin@example.com',
@@ -32,7 +33,8 @@ class UserSeeder extends Seeder
             [
                 'id'=>200,
                 'given_name'=>'Adrian',
-                'preferred_name'=>'Gould',
+                'family_name'=>'Gould',
+                'preferred_name'=>'Ad',
                 'preferred_pronouns' => 'he/him',
                 'email'=>'adrain@example.com',
                 'password'=>Hash::make('Password1'),
@@ -44,7 +46,8 @@ class UserSeeder extends Seeder
             [
                 'id'=>202,
                 'given_name'=>'Chloe',
-                'preferred_name'=>'Gu',
+                'family_name'=>'Gu',
+                'preferred_name'=>'Chloe',
                 'preferred_pronouns' => 'she/her',
                 'email'=>'chloe@example.com',
                 'password'=>Hash::make('Password1'),
@@ -56,7 +59,8 @@ class UserSeeder extends Seeder
 
             [
                 'id'=>1000,
-                'given_name'=>"Jacques d'Carre",
+                'given_name'=>"Jacques",
+                'family_name'=>"d'Carre",
                 'preferred_name'=>'Jacques',
                 'preferred_pronouns' => 'he/him',
                 'email'=>'jacques@example.com',
@@ -67,7 +71,8 @@ class UserSeeder extends Seeder
 
             [
                 'id'=>1001,
-                'given_name'=>"Eileen Dover",
+                'given_name'=>"Eileen",
+                'family_name'=>"Dover",
                 'preferred_name'=>'Eileen',
                 'preferred_pronouns' => 'he/him',
                 'email'=>'eileen@example.com',
@@ -79,7 +84,8 @@ class UserSeeder extends Seeder
             [
                 'id'=>1002,
                 'given_name'=>'Robyn',
-                'preferred_name'=>'Banks',
+                'family_name'=>'Banks',
+                'preferred_name'=>'Robyn',
                 'preferred_pronouns' => 'he/him',
                 'email'=>'robyn@example.com',
                 'password'=>Hash::make('Password1'),

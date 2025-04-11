@@ -142,12 +142,17 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'given_name' => ['required', 'min:1', 'max:255', 'string',],
-            'preferred_name' => ['required', 'min:1', 'max:255', 'string',],
+            'family_name' => ['required', 'min:1', 'max:255', 'string',],
+            'preferred_name' => ['nullable', 'min:1', 'max:255', 'string',],
             'preferred_pronouns' => ['required',],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class,],
             'password' => ['required', 'confirmed', 'min:4', 'max:255'],
             'roles' => ['required', 'array'],
         ]);
+
+        if (empty($validated['perferred_name'])) {
+            $validated['perferred_name'] = $validated['given_nmae'];
+        }
 
         $validated['preferred_pronouns'] = implode(',', $validated['preferred_pronouns']);
         $validated['id'] = Auth::id();
