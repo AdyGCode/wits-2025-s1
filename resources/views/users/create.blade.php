@@ -21,7 +21,7 @@
             </x-primary-link-button>
         </header>
 
-        {{-- <x-flash-message :data="session()"/>--}}
+        <x-flash-message :data="session()"/>
 
         <div class="flex flex-col flex-wrap my-4 mt-8">
             <section class="grid grid-cols-1 gap-4 px-4 mt-4 sm:px-8">

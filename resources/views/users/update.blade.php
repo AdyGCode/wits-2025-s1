@@ -48,18 +48,10 @@
                                 class="py-4 px-6 border-b border-neutral-200 bg-white font-medium text-zinc-800 dark:border-white/10">
 
                                 <div class="flex flex-col my-2 mt-2">
-                                    <x-input-label for="name">
-                                        Nickname
-                                    </x-input-label>
-                                    <x-text-input id="name" name="name" value="{{ old('name') ?? $user->name }}" />
-                                    {{-- <x-input-error :messages="1" class="mt-2"/>--}}
-                                </div>
-
-                                <div class="flex flex-col my-2">
                                     <x-input-label for="given_name">
                                         Given Name
                                     </x-input-label>
-                                    <x-text-input id="given_name" name="given_name" value="" />
+                                    <x-text-input id="name" name="name" value="{{ old('given_name') ?? $user->given_name }}" />
                                     {{-- <x-input-error :messages="1" class="mt-2"/>--}}
                                 </div>
 
@@ -67,7 +59,15 @@
                                     <x-input-label for="family_name">
                                         Family Name
                                     </x-input-label>
-                                    <x-text-input id="family_ame" name="family_name" value="" />
+                                    <x-text-input id="family_name" name="family_name" value="{{ old('family_name') ?? $user->family_name }}" />
+                                    {{-- <x-input-error :messages="1" class="mt-2"/>--}}
+                                </div>
+
+                                <div class="flex flex-col my-2">
+                                    <x-input-label for="preferred_name">
+                                        Preferred Name
+                                    </x-input-label>
+                                    <x-text-input id="pereferred_name" name="preferred_name" value="{{ old('preferred_name') ?? $user->preferred_name }}" />
                                     {{-- <x-input-error :messages="1" class="mt-2"/>--}}
                                 </div>
 
@@ -91,7 +91,7 @@
                                         Confirm password
                                     </x-input-label>
                                     <x-text-input id="password_confirmation" name="password_confirmation" />
-                                    {{-- <x-input-error :messages="1" class="mt-2"/>--}}
+                                    <x-input-error :messages="1" class="mt-2"/>
                                 </div>
 
                                 <div class="flex flex-col my-2">
@@ -100,10 +100,7 @@
                                     </x-input-label>
                                     <select id="roles" name="roles[]" class="form-select">
                                         @foreach($roles as $role)
-                                        <option value="{{ $role->name }}"
-                                            @if(in_array($role->name, $user->roles->pluck('name')->toArray()) || (count($user->roles) == 0 && $role->name == 'guest'))
-                                            selected
-                                            @endif>
+                                        <option value="{{ $role->name }}" {{ in_array($role->name, old('roles', [])) ? 'selected' : '' }}>
                                             {{ $role->name }}
                                         </option>
                                         @endforeach

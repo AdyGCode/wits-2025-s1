@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 
@@ -97,6 +98,7 @@ class UserController extends Controller
         $user = User::select(
             'users.id as id',
             'users.given_name as given_name',
+            'users.family_name as family_name',
             'users.preferred_name as preferred_name',
             'users.email as email',
             'users.preferred_pronouns as preferred_pronouns',
@@ -144,14 +146,14 @@ class UserController extends Controller
             'given_name' => ['required', 'min:1', 'max:255', 'string',],
             'family_name' => ['required', 'min:1', 'max:255', 'string',],
             'preferred_name' => ['nullable', 'min:1', 'max:255', 'string',],
-            'preferred_pronouns' => ['required',],
+            'preferred_pronouns' => ['nullable','required',],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class,],
             'password' => ['required', 'confirmed', 'min:4', 'max:255'],
             'roles' => ['required', 'array'],
         ]);
 
-        if (empty($validated['perferred_name'])) {
-            $validated['perferred_name'] = $validated['given_nmae'];
+        if (empty($validated['preferred_name'])) {
+            $validated['preferred_name'] = $validated['given_nmae'];
         }
 
         $validated['preferred_pronouns'] = implode(',', $validated['preferred_pronouns']);
@@ -172,11 +174,25 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $this->authorize('update', $user);
+        // $this->authorize('update', $user);
+        $currentUser = Auth::user();
 
-        $roles = Role::where('name', '!=', 'Superuser')->get();
+        $updateValues['updated_at'] = now();
 
-        return view('users.edit', [
+        if ($currentUser->hasRole('SuperAdmin')) {
+            $roles = Role::where('name', 'SuperAdmin')->get();
+        } elseif ($currentUser->hasRole('Admin')) {
+            $roles = Role::where('name', 'SuerAdmin')->get();
+        } elseif ($currentUser->hasRole('Staff') || $currentUser->hasRole("Student")) {
+            if ($currentUser->id !== $user->id) {
+                abort(403, 'This action is unauthorized!');
+            }
+            $roles = Role::where('name', 'SuperAdmin')->get();
+        } else {
+            abort(403, 'This action is unauthorized');
+        }
+
+        return view('users.update', [
             'user' => $user,
             'roles' => $roles
         ]);
@@ -190,43 +206,63 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $this->authorize('update', $user);
+        // $this->authorize('update', $user);
 
-        $request->validate([
+        $validated = $request->validate([
             'given_name' => 'required|string',
             'family_name' => 'required|string',
-            'nickname' => 'nullable|string',
+            'preferred_name' => 'nullable|string',
+            'preferred_pronouns'=> 'nullable',
             'email' => 'required|email',
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'required|string'
-        ], [
-            'given_name.required' => 'Given name is required',
-            'family_name.required' => 'Family name is required',
-            'password.min' => 'Password must be at least 6 characters',
-            'password.confirmed' => 'Passwords do not match',
-            'role.required' => 'Role is required'
+            'roles' => 'required|string'
         ]);
 
-        $allowedFields = ['nickname', 'given_name', 'family_name', 'email'];
-        $updateValues = $request->only($allowedFields);
-
-        if (empty($updateValues['nickname'])) {
-            $updateValues['nickname'] = $updateValues['given_name'];
+        if (empty($validated['preferred_name'])) {
+            $validated['preferred_name'] = $validated['given_name'];
         }
+
+        $validated['preferred_pronouns'] = implode(',', $validated['preferred_pronouns'] ?? []);
+
+        $updateValues = [
+            'given_name' => $validated['given_name'],
+            'family_name' => $validated['family_name'],
+            'preferred_name' => $validated['preferred_name'],
+            'email' => $validated['email'],
+            'preferred_pronouns' => $validated['preferred_pronouns'],
+            'updated_at' => now(),
+        ];
 
         if ($request->password) {
             $updateValues['password'] = Hash::make($request->password);
         }
 
-        $updateValues['updated_at'] = now();
-        $user->update($updateValues);
+        // $currentUser = Auth::user();
+
+        // $updateValues['updated_at'] = now();
+
+        // if ($currentUser->hasRole('SuperAdmin')) {
+        //     $user->update($updateValues);
+        //     $user->syncRoles($validated['roles']);
+        // } elseif ($currentUser->hasRole('Admin')) {
+        //     unset($validated['roles']);
+        //     $user->update($updateValues);
+        // } elseif ($currentUser->hasRole('Staff') || $currentUser->hasRole("Student")) {
+        //     if ($currentUser->id !== $user->id) {
+        //         abort(403, 'This action is unauthorized!');
+        //     }
+        //     unset($validated['roles']);
+        //     $user->update($updateValues);
+        // } else {
+        //     abort(403, 'This action is unauthorized');
+        // }
 
 
-        if ($request->role !== 'Superuser') {
-            $user->syncRoles($request->role);
-        }
+        // if ($request->role !== 'SuperAdmin') {
+        //     $user->syncRoles($request->role);
+        // }
 
-        Session::flash('success', 'User updated successfully.');
+        // Session::flash('success', 'User updated successfully.');
         return redirect()->route('users.show', $user);
     }
 

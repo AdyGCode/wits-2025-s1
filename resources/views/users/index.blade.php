@@ -23,9 +23,9 @@
             </x-primary-link-button>
         </header>
 
-        {{-- @auth--}}
-        {{-- <x-flash-message :data="session()"/>--}}
-        {{-- @endauth--}}
+        @auth
+        <x-flash-message :data="session()"/>
+        @endauth
 
         <div class="flex flex-col flex-wrap my-4 mt-8">
             <section class="grid grid-cols-1 gap-4 px-4 mt-4 sm:px-8">
