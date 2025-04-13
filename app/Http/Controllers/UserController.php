@@ -95,6 +95,7 @@ class UserController extends Controller
     public function show($id)
     {
 
+        $currentUser = Auth::user();
         $user = User::select(
             'users.id as id',
             'users.given_name as given_name',
@@ -115,6 +116,13 @@ class UserController extends Controller
         if (!$user) {
             return response()->view('errors.404', ['message' => 'User not found'], 404);
         }
+
+        if (!($currentUser->hasRole('SuperAdmin') || 
+        $currentUser->hasRole('Admin') || 
+        $currentUser->id == $user->id)) {
+    abort(403, 'You do not have permission to view this user.');
+}
+
 
         return view('users.show', [
             'user' => $user,
@@ -180,7 +188,6 @@ class UserController extends Controller
         if (!$currentUser->hasRole('SuperAdmin') && $currentUser->id !== $user->id) {
             abort(403, 'You do not have permission to edit this user.');
         }
-        
         $roles = $user->roles;
         $editable = false;
 
