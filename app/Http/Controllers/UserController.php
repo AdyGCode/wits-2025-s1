@@ -258,15 +258,26 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if (!$this->authorize('delete', $user)) {
-            return redirect()->back()
-                ->withErrors(['role' => 'Administrators are not allowed to delete other administrators.'])
-                ->withInput();
+        $currentUser = Auth::user();
+
+        if (!($currentUser->hasRole('SuperAdmin') || $currentUser->hasRole('Admin'))) {
+            abort(403, 'You do not have permission to delete this user.');
         }
 
         $user->delete();
-        Session::flash('success', 'User deleted successfully');
-        return redirect()->route('users.home');
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully!');
+
+        
+        // if (!$this->authorize('delete', $user)) {
+        //     return redirect()->back()
+        //         ->withErrors(['role' => 'Administrators are not allowed to delete other administrators.'])
+        //         ->withInput();
+        // }
+
+        // $user->delete();
+        // Session::flash('success', 'User deleted successfully');
+        // return redirect()->route('users.home');
     }
 
 

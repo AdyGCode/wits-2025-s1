@@ -64,14 +64,14 @@
                                 @csrf
                                 @method('DELETE')
 
-                                <x-primary-link-button href="{{ route('users.index') }}" class="bg-zinc-800">
-                                    Back
+                                <x-primary-link-button :href="route('users.index')" class="bg-zinc-800">
+                                    {{ __('Back') }}
                                 </x-primary-link-button>
-                                <x-primary-link-button href="{{ route('users.edit', $user->id) }}" class="bg-zinc-800">
-                                    Edit
+                                <x-primary-link-button :href="route('users.edit', $user)" class="bg-zinc-800">
+                                    {{ __('Edit') }}
                                 </x-primary-link-button>
-                                <x-secondary-button type="submit" class="bg-zinc-200">
-                                    Delete
+                                <x-secondary-button type="submit" class="!text-gray-700 bg-zinc-200 pr-2 pl-2 hover:bg-red-700 hover:!text-white">
+                                {{ __('Delete') }}
                                 </x-secondary-button>
                             </form>
                         </footer>
