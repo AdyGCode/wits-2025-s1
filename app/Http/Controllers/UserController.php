@@ -153,7 +153,7 @@ class UserController extends Controller
         ]);
 
         if (empty($validated['preferred_name'])) {
-            $validated['preferred_name'] = $validated['given_nmae'];
+            $validated['preferred_name'] = $validated['given_name'];
         }
 
         $validated['preferred_pronouns'] = implode(',', $validated['preferred_pronouns']);
@@ -176,25 +176,20 @@ class UserController extends Controller
     {
         // $this->authorize('update', $user);
         $currentUser = Auth::user();
+        $roles = $user->roles;
+        $editable = false;
 
         $updateValues['updated_at'] = now();
 
         if ($currentUser->hasRole('SuperAdmin')) {
-            $roles = Role::where('name', 'SuperAdmin')->get();
-        } elseif ($currentUser->hasRole('Admin')) {
-            $roles = Role::where('name', 'SuerAdmin')->get();
-        } elseif ($currentUser->hasRole('Staff') || $currentUser->hasRole("Student")) {
-            if ($currentUser->id !== $user->id) {
-                abort(403, 'This action is unauthorized!');
-            }
-            $roles = Role::where('name', 'SuperAdmin')->get();
-        } else {
-            abort(403, 'This action is unauthorized');
+            $roles = Role::all();
+            $editable = true;
         }
 
         return view('users.update', [
             'user' => $user,
-            'roles' => $roles
+            'roles' => $roles,
+            'editable' => $editable,
         ]);
     }
 
@@ -206,8 +201,6 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        // $this->authorize('update', $user);
-
         $validated = $request->validate([
             'given_name' => 'required|string',
             'family_name' => 'required|string',
@@ -215,7 +208,7 @@ class UserController extends Controller
             'preferred_pronouns'=> 'nullable',
             'email' => 'required|email',
             'password' => 'nullable|string|min:6|confirmed',
-            'roles' => 'required|string'
+            'roles' => 'required|array'
         ]);
 
         if (empty($validated['preferred_name'])) {
@@ -237,33 +230,14 @@ class UserController extends Controller
             $updateValues['password'] = Hash::make($request->password);
         }
 
-        // $currentUser = Auth::user();
+        $user->update($updateValues);
 
-        // $updateValues['updated_at'] = now();
+        if (Auth::user()->hasRole('SuperAdmin') && isset($validated['roles'])) {
+            $user->syncRoles($validated['roles']);
+        }
 
-        // if ($currentUser->hasRole('SuperAdmin')) {
-        //     $user->update($updateValues);
-        //     $user->syncRoles($validated['roles']);
-        // } elseif ($currentUser->hasRole('Admin')) {
-        //     unset($validated['roles']);
-        //     $user->update($updateValues);
-        // } elseif ($currentUser->hasRole('Staff') || $currentUser->hasRole("Student")) {
-        //     if ($currentUser->id !== $user->id) {
-        //         abort(403, 'This action is unauthorized!');
-        //     }
-        //     unset($validated['roles']);
-        //     $user->update($updateValues);
-        // } else {
-        //     abort(403, 'This action is unauthorized');
-        // }
-
-
-        // if ($request->role !== 'SuperAdmin') {
-        //     $user->syncRoles($request->role);
-        // }
-
-        // Session::flash('success', 'User updated successfully.');
-        return redirect()->route('users.show', $user);
+        return redirect()->route('users.show', $user)->with('success', 'User updated successfully!');
+        // return redirect()->route('users.show', $user);
     }
 
     /**

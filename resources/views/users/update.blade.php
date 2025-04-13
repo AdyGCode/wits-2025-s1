@@ -51,7 +51,7 @@
                                     <x-input-label for="given_name">
                                         Given Name
                                     </x-input-label>
-                                    <x-text-input id="name" name="name" value="{{ old('given_name') ?? $user->given_name }}" />
+                                    <x-text-input id="given_name" name="given_name" value="{{ old('given_name') ?? $user->given_name }}" />
                                     {{-- <x-input-error :messages="1" class="mt-2"/>--}}
                                 </div>
 
@@ -67,7 +67,7 @@
                                     <x-input-label for="preferred_name">
                                         Preferred Name
                                     </x-input-label>
-                                    <x-text-input id="pereferred_name" name="preferred_name" value="{{ old('preferred_name') ?? $user->preferred_name }}" />
+                                    <x-text-input id="preferred_name" name="preferred_name" value="{{ old('preferred_name') ?? $user->preferred_name }}" />
                                     {{-- <x-input-error :messages="1" class="mt-2"/>--}}
                                 </div>
 
@@ -76,7 +76,7 @@
                                         Email
                                     </x-input-label>
                                     <x-text-input id="email" name="email" value="{{ old('email') ?? $user->email }}" />
-                                    {{-- <x-input-error :messages="1" class="mt-2"/>--}}
+                                    <x-input-error :messages="1" class="mt-2"/>
                                 </div>
 
                                 <div class="flex flex-col my-2">
@@ -98,18 +98,24 @@
                                     <x-input-label for="roles">
                                         Roles
                                     </x-input-label>
-                                    <select id="roles" name="roles[]" class="form-select">
-                                        @foreach($roles as $role)
-                                        <option value="{{ $role->name }}" {{ in_array($role->name, old('roles', [])) ? 'selected' : '' }}>
-                                            {{ $role->name }}
-                                        </option>
-                                        @endforeach
+                                    <select id="roles" name="roles[]" class="form-select" {{ !$editable ? 'disabled' : '' }}>
+                                    @foreach($roles as $role)
+                                    <option value="{{ $role->name }}"
+                                    @if(in_array($role->name, old('roles', $user->roles->pluck('name')->toArray())))
+                                    selected
+                                    @endif>
+                                    {{ $role->name }}
+                                    </option>
+                                    @endforeach
                                     </select>
-
+                                    @if(!$editable)
+                                        @foreach($user->roles as $role)
+                                         <input type="hidden" name="roles[]" value="{{ $role->name }}">
+                                          @endforeach
+                                            @endif
                                     <x-input-error :messages="$errors->get('roles')" class="mt-2" />
                                 </div>
                             </section>
-
                             <footer
                                 class="flex gap-4 px-6 py-4 border-b border-neutral-200 font-medium text-zinc-800 dark:border-white/10">
 
@@ -123,12 +129,8 @@
                             </footer>
                         </div>
                     </form>
-
                 </section>
-
             </section>
-
-        </div>
-
-    </article>
+                      </div>     
+                    </article>
 </x-app-layout>
