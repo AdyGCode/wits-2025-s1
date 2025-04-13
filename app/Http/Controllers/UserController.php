@@ -176,6 +176,11 @@ class UserController extends Controller
     {
         // $this->authorize('update', $user);
         $currentUser = Auth::user();
+
+        if (!$currentUser->hasRole('SuperAdmin') && $currentUser->id !== $user->id) {
+            abort(403, 'You do not have permission to edit this user.');
+        }
+        
         $roles = $user->roles;
         $editable = false;
 
